@@ -10,9 +10,7 @@
       </div>
       <fieldset class="form-group">
         <legend>Internal Form</legend>
-        <ng-container *ngComponentOutlet="dynamicComponent;
-                            ngModuleFactory: dynamicModule;
-                            "></ng-container>
+        <div #dynaComp></div>
       </fieldset>
       <button class="btn btn-primary" [disabled]="!dynaAssetForm.valid">Submit</button>
     </form>

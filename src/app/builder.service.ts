@@ -1,8 +1,9 @@
-import { Injectable, Component, Input, NgModule, Compiler, ComponentFactoryResolver } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { Injectable, Component, Input, NgModule, Compiler, ComponentFactoryResolver, OnInit } from '@angular/core';
+import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { CustomCompsModule } from './custom-comps/custom-comps.module';
 import { DynamicInjectorService } from 'app/dynamic-injector.service';
+import { CommonModule } from "@angular/common";
 
 @Injectable()
 export class BuilderService {
@@ -14,17 +15,24 @@ export class BuilderService {
       template: template,
       styles: [styles]
     })
-    class CustomDynamicComponent {
+    class CustomDynamicComponent implements OnInit {
       @Input() public initData: any;
       @Input() public formGroup: FormGroup;
-      constructor(public dynaData: DynamicInjectorService){
+      constructor(){
+      }
+      ngOnInit(){
+        const fg = this.formGroup.get('header') as FormGroup;
+        fg.addControl('testInput', new FormControl('Init Value', Validators.required));
+      }
+      public getControl(controlName: string): FormControl {
+        return this.formGroup.get(['header', controlName]) as FormControl;
       }
     };
     return CustomDynamicComponent;
   }
-  private createComponentModule(dynamicComponent: any) {
+  public createComponentModule(dynamicComponent: any) {
     @NgModule({
-      imports: [CustomCompsModule],
+      imports: [CustomCompsModule, FormsModule, ReactiveFormsModule, CommonModule],
       declarations: [
         dynamicComponent
       ],
@@ -35,17 +43,13 @@ export class BuilderService {
     // a module for just this Type
     return RuntimeComponentModule;
   }
-  public createDynamicModule(dynamicComponent) {
-    const module = this.compiler.compileModuleSync(this.createComponentModule(dynamicComponent));
-    // const factory = this.resolver.resolveComponentFactory(dynamicComponent);
-    return module;
-  }
-  // public createInjector(initData: any, formGroup: FormGroup) {
-  //   @Injectable()
-  //   class dynamicInjector {
-  //     injectorInitData = initData;
-  //     formGroup: FormGroup;
-  //   }
-  //   return dynamicInjector;
+  // public createDynamicModule(dynamicComponent) {
+  //   const module = this.compiler.compileModuleSync(this.createComponentModule(dynamicComponent));
+  //   // const factory = this.resolver.resolveComponentFactory(dynamicComponent);
+  //   return module;
   // }
+  public createComponentFactory(module) {
+    return this.compiler.compileModuleAndAllComponentsSync(module);
+  }
+
 }
