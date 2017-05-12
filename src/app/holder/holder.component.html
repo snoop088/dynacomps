@@ -1,0 +1,24 @@
+<p>
+  This is a form to test functionality of inner form groups and validations of dynamically compiled components
+</p>
+<div class="container">
+  <div class="col-12">
+    <form action="" [formGroup]="dynaAssetForm" (ngSubmit)="formSubmit()">
+      <div class="form-group">
+        <label for="">Normal Field</label>
+        <input class="form-control" type="text" id="normalField" name="normalField" formControlName="normal">
+      </div>
+      <fieldset class="form-group">
+        <legend>Internal Form</legend>
+        <ng-container *ngComponentOutlet="dynamicComponent;
+                            ngModuleFactory: dynamicModule;
+                            "></ng-container>
+      </fieldset>
+      <button class="btn btn-primary" [disabled]="!dynaAssetForm.valid">Submit</button>
+    </form>
+  </div>
+  <div class="col-12"><h4>Form output</h4>
+    <pre>{{formModel | json}}</pre>
+    <button class="btn btn-secondary" (click)="formModel={}">clear</button>
+  </div>
+</div>
